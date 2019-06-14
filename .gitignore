@@ -1,0 +1,17 @@
+*~
+.idea
+*.pyc
+__pycache__
+.#*
+*.img
+*.image
+venv
+env*
+/cover
+.coverage
+.bandit
+.cover
+htmlcov/
+/data/partitions/
+/dataset_split/
+/trained_models/
