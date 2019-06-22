@@ -10,8 +10,10 @@ env*
 /cover
 .coverage
 .bandit
+/cover/
+dside/cover/
 .cover
 htmlcov/
-/data/partitions/
+/data/
 /dataset_split/
 /trained_models/
