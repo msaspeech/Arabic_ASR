@@ -9,13 +9,16 @@ from ..dataset_generation import generate_pickle_file
 from utils import get_empty_binary_vector, convert_word_to_binary
 
 
-def generate_character_level_input_target_data(transcripts, num_partition, char_to_int, partitions=32,
+def generate_character_level_input_target_data(transcripts, num_partition, char_to_int, partitions,
                                                test=False):
     """
         Generates two 3D arrays for the decoder input data and target data.
         Fills the 3D arrays for each sample of our dataset
         Return OneHotEncoded Decoder Input data
         Return OneHotEncoded Target data
+        :param num_partition: integer
+        :param partitions: List
+        :param test: Boolean
         :param transcripts: List of Strings
         :param char_to_int: Dict
         :return: 3D numpy Array, 3D numpy Array
@@ -73,10 +76,13 @@ def generate_character_level_input_target_data(transcripts, num_partition, char_
     # return decoder_input_data, decoder_target_data
 
 
-def generate_word_level_input_target_data(transcripts, num_partition, char_to_int, partitions=8, test=False):
+def generate_word_level_input_target_data(transcripts, num_partition, char_to_int, partitions, test=False):
     """
            Generates two 3D arrays for the decoder input data and target data.
            Fills the 3D arrays for each sample of our dataset
+           :param num_partition: Integer
+           :param partitions: List
+           :param test: Boolean
            :param transcripts: List of Strings
            :param char_to_int: Dict
            :return: 3D numpy Array, 3D numpy Array
@@ -261,6 +267,7 @@ def generate_decoder_input_target(transcripts, dataset_number, word_level=False,
     """
 
     if word_level:
+        # Word level encoding
         character_set = settings.CHARACTER_SET
         char_to_int = convert_to_int(sorted(character_set))
         generate_word_level_input_target_data(transcripts=transcripts,
@@ -268,10 +275,8 @@ def generate_decoder_input_target(transcripts, dataset_number, word_level=False,
                                               char_to_int=char_to_int,
                                               partitions=partitions,
                                               test=test)
-
-
     else:
-        # Character level recognition
+        # Character level encoding
         character_set = settings.CHARACTER_SET
         char_to_int = convert_to_int(sorted(character_set))
         generate_character_level_input_target_data(transcripts=transcripts,
