@@ -23,11 +23,6 @@ def train_baseline_seq2seq_model_GRU(mfcc_features, target_length, latent_dim, w
 
     # Decoder training, using 'encoder_states' as initial state.
     decoder_inputs = Input(shape=(None, target_length), name="decoder_input")
-    # masked_inputs = Masking(mask_value=0,)(decoder_inputs)
-
-    # decoder_outputs, decoder_states = get_decoder_outputs_GRU(encoder_states=encoder_states,
-    #                                                          decoder_inputs=decoder_inputs,
-    #                                                          latent_dim=latent_dim)
 
     decoder_outputs, decoder_states = get_decoder_outputs_GRU_test(encoder_states=encoder_states,
                                                                    decoder_inputs=decoder_inputs,
@@ -44,7 +39,7 @@ def train_baseline_seq2seq_model_GRU(mfcc_features, target_length, latent_dim, w
     # Generating Keras Model
     model = Model([encoder_inputs, decoder_inputs], decoder_outputs)
     # print(model.summary())
-    return model, encoder_states
+    return model
 
 
 def train_bidirectional_baseline_seq2seq_model_GRU(mfcc_features, target_length, latent_dim, word_level):

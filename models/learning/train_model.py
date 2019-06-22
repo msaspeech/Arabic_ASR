@@ -27,7 +27,6 @@ class Seq2SeqModel():
             self.target_length = len(settings.CHARACTER_SET)
 
         self.model = None
-        self.encoder_states = None
         self._load_model()
 
     def test_model(self):
@@ -46,6 +45,7 @@ class Seq2SeqModel():
         if file_exists(self.model_path):
             self.model = models.load_model(self.model_path)
             print(self.model.summary())
+
         else:
             if self.model_architecture == 1:
                 print("BASELINE MODEL")
@@ -64,36 +64,14 @@ class Seq2SeqModel():
                     word_level=self.word_level)
 
             elif self.model_architecture == 3:
-                print("BASELINE MODEL")
-                self.model, self.encoder_states = train_baseline_seq2seq_model_GRU(
-                    mfcc_features=self.mfcc_features_length,
-                    target_length=self.target_length,
-                    latent_dim=self.latent_dim,
-                    word_level=self.word_level)
+                print("CNN MODEL")
+                self.model, self.encoder_states = train_cnn_seq2seq_model_GRU(mfcc_features=self.mfcc_features_length,
+                                                                              target_length=self.target_length,
+                                                                              latent_dim=self.latent_dim,
+                                                                              word_based=self.word_level)
 
 
             elif self.model_architecture == 4:
-                print("CNN MODEL")
-                self.model, self.encoder_states = train_cnn_seq2seq_model_GRU(mfcc_features=self.mfcc_features_length,
-                                                                              target_length=self.target_length,
-                                                                              latent_dim=self.latent_dim,
-                                                                              word_based=self.word_level)
-
-            elif self.model_architecture == 5:
-                print("CNN MODEL")
-                self.model, self.encoder_states = train_cnn_seq2seq_model_GRU(mfcc_features=self.mfcc_features_length,
-                                                                              target_length=self.target_length,
-                                                                              latent_dim=self.latent_dim,
-                                                                              word_based=self.word_level)
-            elif self.model_architecture == 6:
-                print("BASELINE MODEL")
-                self.model, self.encoder_states = train_baseline_seq2seq_model_GRU(
-                    mfcc_features=self.mfcc_features_length,
-                    target_length=self.target_length,
-                    latent_dim=self.latent_dim,
-                    word_level=self.word_level)
-
-            else:
                 print("BI CNN MODEL")
                 self.model, self.encoder_states = train_cnn_bidirectional_seq2seq_model_GRU(
                     mfcc_features=self.mfcc_features_length,
@@ -101,8 +79,8 @@ class Seq2SeqModel():
                     latent_dim=self.latent_dim,
                     word_level=self.word_level)
 
+
     def train_model(self):
-        print("ENCODER STATES")
 
         model_saver = ModelSaver(model_name=self.model_name, model_path=self.model_path,
                                  encoder_states=self.encoder_states,
