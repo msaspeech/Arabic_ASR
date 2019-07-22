@@ -7,15 +7,13 @@ from .plot import plot_train_loss_acc
 
 class ModelSaver(Callback):
 
-    def __init__(self, model_name, model_path, encoder_states, drive_instance, word_level=True, output_length=16):
+    def __init__(self, model_name, model_path,  word_level=True, output_length=16):
         super().__init__()
 
         self.model_name = model_name
         self.model_path = model_path
         self.word_level = word_level
         self.output_length = output_length
-        self.encoder_states = encoder_states
-        self.drive_instance = drive_instance
 
     def on_epoch_end(self, epoch, logs=None):
         # Saving training history

@@ -36,20 +36,11 @@ def get_decoder_outputs(target_length, encoder_states, decoder_inputs, latent_di
     decoder_gru2_layer = GRU(latent_dim,
                              stateful=False,
                              return_sequences=True,
-                             return_state=False,
+                             return_state=True,
                              kernel_constraint=None,
                              kernel_regularizer=None,
                              name="decoder_gru2_layer")
-    decoder_gru2 = decoder_gru2_layer(decoder_gru1)
-
-    decoder_gru3_layer = GRU(latent_dim,
-                             stateful=False,
-                             return_sequences=True,
-                             return_state=False,
-                             kernel_constraint=None,
-                             kernel_regularizer=None,
-                             name="decoder_gru3_layer")
-    decoder_outputs = decoder_gru3_layer(decoder_gru2)
+    decoder_outputs, state_h = decoder_gru2_layer(decoder_gru1)
 
     return decoder_outputs
 
@@ -86,20 +77,11 @@ def get_decoder_outputs_gpu(target_length, encoder_states, decoder_inputs, laten
     decoder_gru2_layer = CuDNNGRU(latent_dim,
                                   stateful=False,
                                   return_sequences=True,
-                                  return_state=False,
+                                  return_state=True,
                                   kernel_constraint=None,
                                   kernel_regularizer=None,
                                   name="decoder_gru2_layer")
-    decoder_gru2 = decoder_gru2_layer(decoder_gru1)
-
-    decoder_gru3_layer = CuDNNGRU(latent_dim,
-                                  stateful=False,
-                                  return_sequences=True,
-                                  return_state=False,
-                                  kernel_constraint=None,
-                                  kernel_regularizer=None,
-                                  name="decoder_gru3_layer")
-    decoder_outputs = decoder_gru3_layer(decoder_gru2)
+    decoder_outputs, state_h = decoder_gru2_layer(decoder_gru1)
 
     return decoder_outputs
 
@@ -137,18 +119,11 @@ def decoder_for_bidirectional_encoder_GRU(target_length, encoder_states, decoder
     decoder_gru2_layer = GRU(latent_dim * 2,
                                   stateful=False,
                                   return_sequences=True,
+                                  return_state=True,
                                   kernel_constraint=None,
                                   kernel_regularizer=None,
                                   name="decoder_bi_gru2_layer")
-    decoder_gru2 = decoder_gru2_layer(decoder_gru1)
-
-    decoder_gru3_layer = GRU(latent_dim * 2,
-                                  stateful=False,
-                                  return_sequences=True,
-                                  kernel_constraint=None,
-                                  kernel_regularizer=None,
-                                  name="decoder_bi_gru3_layer")
-    decoder_outputs = decoder_gru3_layer(decoder_gru2)
+    decoder_outputs, state_h = decoder_gru2_layer(decoder_gru1)
 
     return decoder_outputs
 
@@ -186,18 +161,11 @@ def decoder_for_bidirectional_encoder_GRU_gpu(target_length, encoder_states, dec
     decoder_gru2_layer = CuDNNGRU(latent_dim * 2,
                                    stateful=False,
                                    return_sequences=True,
+                                   return_state=True,
                                    kernel_constraint=None,
                                    kernel_regularizer=None,
                                    name="decoder_bi_gru2_layer")
-    decoder_gru2 = decoder_gru2_layer(decoder_gru1)
-
-    decoder_gru3_layer = CuDNNGRU(latent_dim * 2,
-                                   stateful=False,
-                                   return_sequences=True,
-                                   kernel_constraint=None,
-                                   kernel_regularizer=None,
-                                   name="decoder_bi_gru3_layer")
-    decoder_outputs = decoder_gru3_layer(decoder_gru2)
+    decoder_outputs, state_h = decoder_gru2_layer(decoder_gru1)
 
     return decoder_outputs
 

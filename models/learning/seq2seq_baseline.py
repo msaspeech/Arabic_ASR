@@ -19,6 +19,10 @@ def train_baseline_seq2seq_model(mfcc_features, target_length, latent_dim, word_
     # Encoder training
     encoder_inputs = Input(shape=(None, mfcc_features), name="encoder_input")
     decoder_inputs = Input(shape=(None, target_length), name="decoder_input")
+    pre_decoder_dense_layer = Dense(44, activation="relu", name="pre_decoder_dense")
+    decoder_entries = pre_decoder_dense_layer(decoder_inputs)
+    dropout_layer = Dropout(0.1, name="decoder_dropout")
+    decoder_entries = dropout_layer(decoder_entries)
 
     if gpu_enabled:
 
@@ -32,7 +36,7 @@ def train_baseline_seq2seq_model(mfcc_features, target_length, latent_dim, word_
 
         decoder_outputs = get_decoder_outputs_gpu(target_length=target_length,
                                                   encoder_states=encoder_states,
-                                                  decoder_inputs=decoder_inputs,
+                                                  decoder_inputs=decoder_entries,
                                                   latent_dim=latent_dim)
     else:
         # Encoder model
@@ -43,11 +47,8 @@ def train_baseline_seq2seq_model(mfcc_features, target_length, latent_dim, word_
         # Decoder training, using 'encoder_states' as initial state.
         decoder_outputs = get_decoder_outputs(target_length=target_length,
                                               encoder_states=encoder_states,
-                                              decoder_inputs=decoder_inputs,
+                                              decoder_inputs=decoder_entries,
                                               latent_dim=latent_dim)
-
-    dropout_layer = Dropout(0.5, name="decoder_dropout")
-    decoder_outputs = dropout_layer(decoder_outputs)
 
     # Dense Output Layers
     if word_level:
@@ -59,7 +60,6 @@ def train_baseline_seq2seq_model(mfcc_features, target_length, latent_dim, word_
 
     # Generating Keras Model
     model = Model([encoder_inputs, decoder_inputs], decoder_outputs)
-    # print(model.summary())
     return model
 
 
@@ -72,8 +72,15 @@ def train_bidirectional_baseline_seq2seq_model(mfcc_features, target_length, lat
         :return: Model, Model, Model
         """
     # Encoder training
+
     encoder_inputs = Input(shape=(None, mfcc_features), name="encoder_input")
+
     decoder_inputs = Input(shape=(None, target_length), name="decoder_input")
+
+    pre_decoder_dense_layer = Dense(44, activation="relu", name="pre_decoder_dense")
+    decoder_entries = pre_decoder_dense_layer(decoder_inputs)
+    dropout_layer = Dropout(0.1, name="decoder_dropout")
+    decoder_entries = dropout_layer(decoder_entries)
 
     if gpu_enabled:
         encoder_states = encoder_bi_GRU_gpu(input_shape=mfcc_features,
@@ -82,9 +89,10 @@ def train_bidirectional_baseline_seq2seq_model(mfcc_features, target_length, lat
 
         # Decoder training, using 'encoder_states' as initial state.
 
+
         decoder_outputs = decoder_for_bidirectional_encoder_GRU_gpu(target_length=target_length,
                                                                                 encoder_states=encoder_states,
-                                                                                decoder_inputs=decoder_inputs,
+                                                                                decoder_inputs=decoder_entries,
                                                                                 latent_dim=latent_dim)
 
     else:
@@ -96,11 +104,9 @@ def train_bidirectional_baseline_seq2seq_model(mfcc_features, target_length, lat
 
         decoder_outputs = decoder_for_bidirectional_encoder_GRU(target_length=target_length,
                                                                     encoder_states=encoder_states,
-                                                                    decoder_inputs=decoder_inputs,
+                                                                    decoder_inputs=decoder_entries,
                                                                     latent_dim=latent_dim)
 
-    dropout_layer = Dropout(0.5, name="decoder_dropout")
-    decoder_outputs = dropout_layer(decoder_outputs)
 
     # Dense Output Layers
     if word_level:
@@ -112,8 +118,7 @@ def train_bidirectional_baseline_seq2seq_model(mfcc_features, target_length, lat
 
     # Generating Keras Model
     model = Model([encoder_inputs, decoder_inputs], decoder_outputs)
-    print(model.summary())
-    return model, encoder_states
+    return model
 
 
 def get_multi_output_dense(decoder_outputs, target_length):

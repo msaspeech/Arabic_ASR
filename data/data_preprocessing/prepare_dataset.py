@@ -3,7 +3,6 @@ import os
 
 import numpy as np
 
-from etc import PICKLE_PAD_FILE_PATH, PICKLE_FILE_PATH
 from etc import settings
 from utils import get_character_set, get_distinct_words, empty_directory, get_longest_word_length
 from utils import load_pickle_data, file_exists, generate_pickle_file, get_files
@@ -82,7 +81,7 @@ def _clean_characters_only(transcript, word_based=True):
     return True
 
 
-def _generate_spllited_encoder_input_data_partition(audio_data, dataset_number, partitions=8, test=False):
+def _generate_spllited_encoder_input_data_partition(audio_data, word_level, dataset_number, partitions=8, test=False):
     audio_sets = []
     limits = []
     for i in range(1, partitions + 1):
@@ -98,10 +97,17 @@ def _generate_spllited_encoder_input_data_partition(audio_data, dataset_number, 
     for index, audio_set in enumerate(audio_sets):
         audio_set = np.array(audio_set)
         if not test:
-            path = settings.AUDIO_SPLIT_TRAIN_PATH + "dataset" + str(dataset_number) + "/audio_set" + str(
-                index) + ".pkl"
+            if word_level:
+                path = settings.AUDIO_WORD_SPLIT_TRAIN_PATH + "dataset" + str(dataset_number) + "/audio_set" + str(
+                    index) + ".pkl"
+            else:
+                path = settings.AUDIO_CHAR_SPLIT_TRAIN_PATH + "dataset" + str(dataset_number) + "/audio_set" + str(
+                    index) + ".pkl"
         else:
-            path = settings.AUDIO_SPLIT_TEST_PATH + "dataset" + str(dataset_number) + "/audio_set" + str(index) + ".pkl"
+            if word_level:
+                path = settings.AUDIO_WORD_SPLIT_TEST_PATH + "dataset" + str(dataset_number) + "/audio_set" + str(index) + ".pkl"
+            else:
+                path = settings.AUDIO_CHAR_SPLIT_TEST_PATH + "dataset" + str(dataset_number) + "/audio_set" + str(index) + ".pkl"
 
         generate_pickle_file(audio_set, path)
 
@@ -192,28 +198,42 @@ def upload_dataset_partition(train_ratio=0.95, word_level=False, partitions=8):
     :return: Tuple, Tuple
     """
     print("PREPARING PARTITIONED DATASET")
-    if empty_directory(settings.AUDIO_SPLIT_TRAIN_PATH):
+    if empty_directory(settings.AUDIO_CHAR_SPLIT_TRAIN_PATH) or empty_directory(settings.AUDIO_WORD_SPLIT_TRAIN_PATH):
 
-        if file_exists(settings.DATASET_CHAR_INFORMATION_PATH) is False and file_exists(settings.DATASET_WORD_INFORMATION_PATH) is False:
-            get_dataset_information(word_level, train_ratio=train_ratio)
+        get_dataset_information(word_level, train_ratio=train_ratio)
 
         list_datasets = get_files(settings.PICKLE_PARTITIONS_PATH)
 
         for dataset_number, dataset_file in enumerate(list_datasets):
 
             # Generate directories
-            path = settings.AUDIO_SPLIT_TRAIN_PATH + "dataset" + str(dataset_number) + "/"
-            if not file_exists(path):
-                os.mkdir(path)
-            path = settings.AUDIO_SPLIT_TEST_PATH + "dataset" + str(dataset_number) + "/"
-            if not file_exists(path):
-                os.mkdir(path)
-            path = settings.TRANSCRIPTS_ENCODING_SPLIT_TRAIN_PATH + "dataset" + str(dataset_number) + "/"
-            if not file_exists(path):
-                os.mkdir(path)
-            path = settings.TRANSCRIPTS_ENCODING_SPLIT_TEST_PATH + "dataset" + str(dataset_number) + "/"
-            if not file_exists(path):
-                os.mkdir(path)
+            if word_level:
+                path = settings.AUDIO_WORD_SPLIT_TRAIN_PATH + "dataset" + str(dataset_number) + "/"
+                if not file_exists(path):
+                    os.mkdir(path)
+                path = settings.AUDIO_WORD_SPLIT_TEST_PATH + "dataset" + str(dataset_number) + "/"
+                if not file_exists(path):
+                    os.mkdir(path)
+                path = settings.TRANSCRIPTS_ENCODING_WORD_SPLIT_TRAIN_PATH + "dataset" + str(dataset_number) + "/"
+                if not file_exists(path):
+                    os.mkdir(path)
+                path = settings.TRANSCRIPTS_ENCODING_WORD_SPLIT_TEST_PATH + "dataset" + str(dataset_number) + "/"
+                if not file_exists(path):
+                    os.mkdir(path)
+
+            else:
+                path = settings.AUDIO_CHAR_SPLIT_TRAIN_PATH + "dataset" + str(dataset_number) + "/"
+                if not file_exists(path):
+                    os.mkdir(path)
+                path = settings.AUDIO_CHAR_SPLIT_TEST_PATH + "dataset" + str(dataset_number) + "/"
+                if not file_exists(path):
+                    os.mkdir(path)
+                path = settings.TRANSCRIPTS_ENCODING_CHAR_SPLIT_TRAIN_PATH + "dataset" + str(dataset_number) + "/"
+                if not file_exists(path):
+                    os.mkdir(path)
+                path = settings.TRANSCRIPTS_ENCODING_CHAR_SPLIT_TEST_PATH + "dataset" + str(dataset_number) + "/"
+                if not file_exists(path):
+                    os.mkdir(path)
 
             # Upload train and test data, the train ration is 0.8 and can be modified through ration param
             train_data, test_data = _get_train_test_data_partition(dataset_path=dataset_file, train_ratio=train_ratio)
@@ -228,10 +248,10 @@ def upload_dataset_partition(train_ratio=0.95, word_level=False, partitions=8):
                 # train_audio, train_transcripts = print_suspicious_characters(train_data)
                 test_audio, test_transcripts = _get_audio_transcripts_character_level(test_data)
 
-            _generate_spllited_encoder_input_data_partition(train_audio, dataset_number=dataset_number,
+            _generate_spllited_encoder_input_data_partition(train_audio, word_level=word_level, dataset_number=dataset_number,
                                                             partitions=partitions)
             # train_encoder_input = _get_encoder_input_data(audio_data=train_audio)
-            _generate_spllited_encoder_input_data_partition(test_audio, dataset_number=dataset_number, test=True,
+            _generate_spllited_encoder_input_data_partition(test_audio, word_level=word_level, dataset_number=dataset_number, test=True,
                                                             partitions=partitions)
 
             generate_decoder_input_target(transcripts=train_transcripts,
@@ -246,6 +266,12 @@ def upload_dataset_partition(train_ratio=0.95, word_level=False, partitions=8):
                                           test=True)
 
     else:
+        if not file_exists(settings.DATASET_CHAR_INFORMATION_PATH):
+            get_dataset_information(0, train_ratio=train_ratio)
+
+        if not file_exists(settings.DATASET_WORD_INFORMATION_PATH):
+            get_dataset_information(1, train_ratio=train_ratio)
+
         if word_level:
             general_info = load_pickle_data(settings.DATASET_WORD_INFORMATION_PATH)
             settings.MFCC_FEATURES_LENGTH = general_info[0]

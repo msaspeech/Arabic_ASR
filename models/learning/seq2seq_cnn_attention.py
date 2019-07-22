@@ -30,7 +30,10 @@ def train_cnn_seq2seq_model(mfcc_features, target_length, latent_dim, word_level
     cnn_output = cnn_model(cnn_inputs)
 
     decoder_inputs = Input(shape=(None, target_length), name="decoder_input")
-
+    pre_decoder_dense_layer = Dense(44, activation="relu", name="pre_decoder_dense")
+    decoder_entries = pre_decoder_dense_layer(decoder_inputs)
+    dropout_layer = Dropout(0.1, name="decoder_dropout")
+    decoder_entries = dropout_layer(decoder_entries)
     if gpu_enabled:
 
         encoder_states = get_encoder_states_gpu(input_shape=cnn_model_output_shape,
@@ -40,7 +43,7 @@ def train_cnn_seq2seq_model(mfcc_features, target_length, latent_dim, word_level
         # Decoder training, using 'encoder_states' as initial state.
         decoder_outputs = get_decoder_outputs_gpu(target_length=target_length,
                                                   encoder_states=encoder_states,
-                                                  decoder_inputs=decoder_inputs,
+                                                  decoder_inputs=decoder_entries,
                                                   latent_dim=latent_dim)
 
     else:
@@ -51,12 +54,10 @@ def train_cnn_seq2seq_model(mfcc_features, target_length, latent_dim, word_level
         # Decoder training, using 'encoder_states' as initial state.
         decoder_outputs = get_decoder_outputs(target_length=target_length,
                                               encoder_states=encoder_states,
-                                              decoder_inputs=decoder_inputs,
+                                              decoder_inputs=decoder_entries,
                                               latent_dim=latent_dim)
 
     # Dropout layer
-    dropout_layer = Dropout(0.5, name="decoder_dropout")
-    decoder_outputs = dropout_layer(decoder_outputs)
 
     if word_level:
         target_length = len(settings.CHARACTER_SET) + 1
@@ -67,7 +68,6 @@ def train_cnn_seq2seq_model(mfcc_features, target_length, latent_dim, word_level
 
     # Generating Keras Model
     model = Model([cnn_inputs, decoder_inputs], decoder_outputs)
-    print(model.summary())
 
     return model
 
@@ -90,6 +90,10 @@ def train_cnn_bidirectional_seq2seq_model(mfcc_features, target_length, latent_d
     cnn_output = cnn_model(cnn_inputs)
 
     decoder_inputs = Input(shape=(None, target_length), name="decoder_input")
+    pre_decoder_dense_layer = Dense(44, activation="relu", name="pre_decoder_dense")
+    decoder_entries = pre_decoder_dense_layer(decoder_inputs)
+    dropout_layer = Dropout(0.1, name="decoder_dropout")
+    decoder_entries = dropout_layer(decoder_entries)
 
     if gpu_enabled:
 
@@ -100,7 +104,7 @@ def train_cnn_bidirectional_seq2seq_model(mfcc_features, target_length, latent_d
         # Decoder training, using 'encoder_states' as initial state.
         decoder_outputs = decoder_for_bidirectional_encoder_GRU_gpu(target_length=target_length,
                                                                     encoder_states=encoder_states,
-                                                                    decoder_inputs=decoder_inputs,
+                                                                    decoder_inputs=decoder_entries,
                                                                     latent_dim=latent_dim)
 
     else:
@@ -111,12 +115,8 @@ def train_cnn_bidirectional_seq2seq_model(mfcc_features, target_length, latent_d
         # Decoder training, using 'encoder_states' as initial state.
         decoder_outputs = decoder_for_bidirectional_encoder_GRU(target_length=target_length,
                                                                 encoder_states=encoder_states,
-                                                                decoder_inputs=decoder_inputs,
+                                                                decoder_inputs=decoder_entries,
                                                                 latent_dim=latent_dim)
-
-    # Dropout layer
-    dropout_layer = Dropout(0.5, name="decoder_dropout")
-    decoder_outputs = dropout_layer(decoder_outputs)
 
     if word_level:
         target_length = len(settings.CHARACTER_SET) + 1
@@ -127,7 +127,6 @@ def train_cnn_bidirectional_seq2seq_model(mfcc_features, target_length, latent_d
 
     # Generating Keras Model
     model = Model([cnn_inputs, decoder_inputs], decoder_outputs)
-    print(model.summary())
 
     return model
 

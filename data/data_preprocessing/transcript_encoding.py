@@ -65,10 +65,10 @@ def generate_character_level_input_target_data(transcripts, num_partition, char_
             encoded_transcript_target.pop()
             decoder_target_data[i] = encoded_transcript_target
         if not test:
-            path = settings.TRANSCRIPTS_ENCODING_SPLIT_TRAIN_PATH + "dataset" + str(
+            path = settings.TRANSCRIPTS_ENCODING_CHAR_SPLIT_TRAIN_PATH + "dataset" + str(
                 num_partition) + "/encoded_transcripts" + str(num_dataset) + ".pkl"
         else:
-            path = settings.TRANSCRIPTS_ENCODING_SPLIT_TEST_PATH + "dataset" + str(
+            path = settings.TRANSCRIPTS_ENCODING_CHAR_SPLIT_TEST_PATH + "dataset" + str(
                 num_partition) + "/encoded_transcripts" + str(num_dataset) + ".pkl"
 
         generate_pickle_file((decoder_input_data, decoder_target_data), file_path=path)
@@ -151,10 +151,10 @@ def generate_word_level_input_target_data(transcripts, num_partition, char_to_in
             decoder_target_data[i] = encoded_transcript_target
 
         if not test:
-            path = settings.TRANSCRIPTS_ENCODING_SPLIT_TRAIN_PATH + "dataset" + str(
+            path = settings.TRANSCRIPTS_ENCODING_WORD_SPLIT_TRAIN_PATH + "dataset" + str(
                 num_partition) + "/encoded_transcripts" + str(num_dataset) + ".pkl"
         else:
-            path = settings.TRANSCRIPTS_ENCODING_SPLIT_TEST_PATH + "dataset" + str(
+            path = settings.TRANSCRIPTS_ENCODING_WORD_SPLIT_TEST_PATH + "dataset" + str(
                 num_partition) + "/encoded_transcripts" + str(num_dataset) + ".pkl"
 
         generate_pickle_file((decoder_input_data, decoder_target_data), file_path=path)
@@ -201,9 +201,9 @@ def generate_variable_word_input_target_binary(transcripts, words_to_int, partit
             decoder_target_data[i] = encoded_transcript_target
 
         if not test:
-            path = settings.TRANSCRIPTS_ENCODING_SPLIT_TRAIN_PATH + "encoded_transcripts" + str(num_dataset) + ".pkl"
+            path = settings.TRANSCRIPTS_ENCODING_WORD_SPLIT_TRAIN_PATH + "encoded_transcripts" + str(num_dataset) + ".pkl"
         else:
-            path = settings.TRANSCRIPTS_ENCODING_SPLIT_TEST_PATH + "encoded_transcripts" + str(num_dataset) + ".pkl"
+            path = settings.TRANSCRIPTS_ENCODING_WORD_SPLIT_TEST_PATH + "encoded_transcripts" + str(num_dataset) + ".pkl"
 
         generate_pickle_file((decoder_input_data, decoder_target_data), file_path=path)
 
@@ -253,9 +253,9 @@ def generate_variable_word_input_target_data(transcripts, words_to_int, partitio
             decoder_target_data[i] = encoded_transcript_target
 
         if not test:
-            path = settings.TRANSCRIPTS_ENCODING_SPLIT_TRAIN_PATH + "encoded_transcripts" + str(num_dataset) + ".pkl"
+            path = settings.TRANSCRIPTS_ENCODING_WORD_SPLIT_TRAIN_PATH + "encoded_transcripts" + str(num_dataset) + ".pkl"
         else:
-            path = settings.TRANSCRIPTS_ENCODING_SPLIT_TEST_PATH + "encoded_transcripts" + str(num_dataset) + ".pkl"
+            path = settings.TRANSCRIPTS_ENCODING_WORD_SPLIT_TEST_PATH + "encoded_transcripts" + str(num_dataset) + ".pkl"
         generate_pickle_file((decoder_input_data, decoder_target_data), file_path=path)
 
 
