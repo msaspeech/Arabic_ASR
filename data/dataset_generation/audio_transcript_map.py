@@ -1,7 +1,6 @@
 import re
-
-from etc import GENERATED_DATA_TRANSCRIPTS_PATH, GENERATED_DATA_WAV_PATH
-from utils import get_files, read_file_content
+from etc import settings
+from utils import get_files_full_path, read_file_content
 
 
 def get_transcript_key_value_test_dataset(transcript):
@@ -34,15 +33,39 @@ def map_transcripts_test_dataset(file_path):
     return transcripts_map
 
 
-def map_audio_transcripts():
+def map_audio_transcripts_xml():
+    """
+    Maps an audio folder to its transcription file
+    :return: Dict
+    """
     audio_transcripts_map = dict()
 
-    transcript_file_paths = get_files(GENERATED_DATA_TRANSCRIPTS_PATH)
+    transcript_file_paths = get_files_full_path(settings.GENERATED_DATA_TRANSCRIPTS_PATH)
     for i, transcript_file in enumerate(transcript_file_paths):
         transcriptions = read_file_content(transcript_file)
         for j, transcript in enumerate(transcriptions):
             transcript = transcript.rstrip()
-            audio_file_path = GENERATED_DATA_WAV_PATH + "audio" + str(i) + "/track" + str(j) + ".wav"
+            audio_file_path = settings.GENERATED_DATA_WAV_PATH + "audio" + str(i) + "/track" + str(j) + ".wav"
+            audio_transcripts_map[audio_file_path] = transcript
+
+    return audio_transcripts_map
+
+
+def map_audio_transcripts_generic():
+    """
+    Maps an audio folder to its transcription file
+    :return: Dict
+    """
+    audio_transcripts_map = dict()
+
+    transcript_file_paths = get_files_full_path(settings.TRANSCRIPTIONS_DATA_PATH)
+    audio_file_paths = get_files_full_path(settings.AUDIO_DATA_PATH)
+
+    for i, transcript_file in enumerate(transcript_file_paths):
+        transcriptions = read_file_content(transcript_file)
+        for j, transcript in enumerate(transcriptions):
+            transcript = transcript.rstrip()
+            audio_file_path = audio_file_paths[j]
             audio_transcripts_map[audio_file_path] = transcript
 
     return audio_transcripts_map

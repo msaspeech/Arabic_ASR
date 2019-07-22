@@ -8,6 +8,12 @@ from .split_audio import split_audio
 
 
 def get_audio_transcripts_pairs(audio_files_path, transcription_files_path):
+    """
+    Maps each audio file to its XML trascript file
+    :param audio_files_path: String
+    :param transcription_files_path: String
+    :return: List of tuples
+    """
     audio_transcripts_descriptions = []
 
     audio_files = get_files(audio_files_path)
@@ -20,6 +26,10 @@ def get_audio_transcripts_pairs(audio_files_path, transcription_files_path):
 
 
 def generate_dataset():
+    """
+    Generates dataset in the form of audio directories and transcription files
+    :return:
+    """
     # Getting audio_transcriptions pairs
     audio_descriptions_pairs = get_audio_transcripts_pairs(RAW_DATASET_AUDIO_PATH, RAW_DATASET_TRANSCRIPTIONS)
 

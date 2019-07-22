@@ -4,6 +4,11 @@ from lib import Transcript
 
 
 def get_transcriptions(file_path):
+    """
+    Gets the list of transcriptions that corresponds to one audio fine
+    :param file_path: String
+    :return:
+    """
     transcriptions = []
 
     tree = ET.parse(file_path)
@@ -23,6 +28,12 @@ def get_transcriptions(file_path):
 
 
 def generate_transcriptions_file(transcriptions_desc, output_path):
+    """
+    Creates transcription files
+    :param transcriptions_desc: String
+    :param output_path: String
+    :return:
+    """
     transcriptions_text = []
     for t in transcriptions_desc:
         transcriptions_text.append(t.content)

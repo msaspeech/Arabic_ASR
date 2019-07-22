@@ -1,8 +1,9 @@
 from data import generate_dataset
+from init_directories import init_directories
+from data import generate_pickle_dataset_xml
 
-# from etc import RAW_DATASET_AUDIO_PATH, RAW_DATASET_TRANSCRIPTIONS
-from utils import generate_pickle_dataset
+init_directories()
 
 generate_dataset()
 
-generate_pickle_dataset(threshold=10)
+generate_pickle_dataset_xml(threshold=0.5)
